@@ -1,0 +1,17 @@
+language: java
+jdk:
+  - openjdk7
+  - oraclejdk7
+env:
+  - PLAY_VERSION=2.1-RC2
+before_script:
+  - chmod +x travis/setup.sh
+  - ./travis/setup.sh
+services:
+  - mongodb
+script: ./travis/play-framework/play test
+notifications:
+  # Email notifications are disabled to not annoy anybody.
+  # See http://about.travis-ci.org/docs/user/build-configuration/ to learn more
+  # about configuring notification recipients and more.
+  email: false

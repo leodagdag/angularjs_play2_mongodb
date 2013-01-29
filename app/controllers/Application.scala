@@ -7,7 +7,7 @@ import play.api.libs.functional.syntax._
 import play.api.libs.json.Reads._
 import play.api.libs.json._
 import play.api.mvc._
-import models.User
+import models.{Auth, User}
 import play.modules.reactivemongo.MongoController
 import play.api.Logger
 
@@ -55,7 +55,7 @@ object Application extends Controller with DeadboltActions with MongoController 
       request.body.transform(validateAuthentication).map {
         jsobj =>
           Async {
-            User.checkAuthentication(toAuthQry.writes(jsobj)).map {
+            Auth.checkAuthentication(toAuthQry.writes(jsobj)).map {
               check =>
                 check match {
                   case Some(c) => Ok.withSession(request.session.+((Security.username -> (jsobj \ "username").as[String])))

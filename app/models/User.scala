@@ -1,29 +1,21 @@
 package models
 
 import org.joda.time.DateTime
-import be.objectify.deadbolt.core.models._
 
+import reactivemongo.api.indexes.Index
+import reactivemongo.api.indexes.IndexType._
 import reactivemongo.api._
-
-import indexes.Index
-import indexes.IndexType.Ascending
-import reactivemongo.api.indexes._
 import reactivemongo.bson._
 import reactivemongo.bson.handlers._
 import reactivemongo.bson.handlers.DefaultBSONHandlers._
+
+import play.api._
 
 import play.modules.reactivemongo._
 import play.modules.reactivemongo.PlayBsonImplicits._
 import scala.concurrent.ExecutionContext.Implicits.global
 
-import play.api._
-import libs.json.JsObject
-import play.api.libs.json._
-import play.libs.Scala
-import reactivemongo.api.QueryBuilder
-import models.SecurityRole
-import reactivemongo.bson.BSONDateTime
-import reactivemongo.bson.BSONString
+import concurrent.Future
 
 /**
  * @author leodagdag
@@ -34,14 +26,8 @@ case class User(id: Option[BSONObjectID],
                 role: String,
                 firstName: String,
                 lastName: String,
-                creationDate: Option[DateTime],
-                updateDate: Option[DateTime]) extends Subject {
-  def getRoles: java.util.List[SecurityRole] = Scala.asJava(List(SecurityRole(role)))
-
-  def getPermissions: java.util.List[_ <: Permission] = ???
-
-  def getIdentifier: String = username
-}
+                created: Option[DateTime],
+                updated: Option[DateTime]) {}
 
 object User {
 
@@ -50,8 +36,13 @@ object User {
   private val dbName = "user"
   val db = ReactiveMongoPlugin.db.collection(dbName)
 
-  def ensureIndexes(){
-    List(Index(List("username" -> Ascending), unique = true), Index(List("username" -> Ascending, "password" -> Ascending), unique = true)).foreach {
+  val indexes = List(
+    Index(List("username" -> Ascending), unique = true),
+    Index(List("username" -> Ascending, "password" -> Ascending), unique = true)
+  )
+
+  def ensureIndexes() {
+    indexes.foreach {
       index =>
         db.indexesManager.ensure(index).onComplete {
           case result =>
@@ -59,7 +50,6 @@ object User {
         }
     }
   }
-
 
 
   implicit object UserBSONReader extends BSONReader[User] {
@@ -72,7 +62,7 @@ object User {
         doc.getAs[BSONString]("role").get.value,
         doc.getAs[BSONString]("firstName").get.value,
         doc.getAs[BSONString]("lastName").get.value,
-        doc.getAs[BSONDateTime]("creationDate").map(dt => new DateTime(dt.value)),
+        doc.getAs[BSONDateTime]("created").map(dt => new DateTime(dt.value)),
         doc.getAs[BSONDateTime]("updateDate").map(dt => new DateTime(dt.value)))
     }
   }
@@ -87,28 +77,37 @@ object User {
         "role" -> BSONString(user.password),
         "firstName" -> BSONString(user.firstName),
         "lastName" -> BSONString(user.lastName),
-        "creationDate" -> user.creationDate.map(date => BSONDateTime(date.getMillis)),
-        "updateDate" -> user.updateDate.map(date => BSONDateTime(date.getMillis)))
+        "created" -> user.created.map(date => BSONDateTime(date.getMillis)),
+        "updated" -> user.updated.map(date => BSONDateTime(date.getMillis))
+      )
     }
   }
 
-  def byUsername(username: String) = {
+  object AuthBSONWriter extends BSONWriter[User] {
+    def toBSON(user: User) = {
+
+      BSONDocument(
+        "_id" -> user.id.getOrElse(BSONObjectID.generate),
+        "username" -> BSONString(user.username),
+        "password" -> BSONString(user.password),
+        "role" -> BSONString(user.password)
+      )
+    }
+  }
+
+  def byId(id: String): Future[Option[User]] = {
+    val q: QueryBuilder = QueryBuilder().query(toObjectId.writes(id))
+    User.db.find[User](q).headOption
+  }
+
+  def byUsername(username: String): Future[Option[User]] = {
     val q: QueryBuilder = QueryBuilder().query(BSONDocument("username" -> new BSONString(username)))
     User.db.find[User](q).headOption
   }
 
-  def asSubject(username: String) = {
-    val q: QueryBuilder = QueryBuilder().query(BSONDocument("username" -> new BSONString(username)))
-    User.db.find[Subject](q).headOption
-  }
 
-  def checkAuthentication(auth: JsObject) = {
-    val q = QueryBuilder().query(auth)
-    User.db.find[User](q).headOption
-  }
-
-  def all()() = {
-    val q: QueryBuilder = QueryBuilder().query(BSONDocument("" -> new BSONString("")))
-    User.db.find[User](q).headOption
+  def all() = {
+    val q: QueryBuilder = QueryBuilder().query(BSONDocument())
+    User.db.find[User](q).toList()
   }
 }

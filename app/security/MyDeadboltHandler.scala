@@ -3,7 +3,7 @@ package security
 import be.objectify.deadbolt.scala.{DeadboltHandler, DynamicResourceHandler}
 import play.api.mvc.{Results, Result, Request}
 import be.objectify.deadbolt.core.models.Subject
-import models.User
+import models.Auth
 import concurrent.duration.FiniteDuration
 import java.util.concurrent.TimeUnit
 import concurrent.Await
@@ -16,7 +16,7 @@ class MyDeadboltHandler(dynamicResourceHandler: Option[DynamicResourceHandler] =
 
   override def getSubject[A](request: Request[A]): Option[Subject] = {
     request.session.get("username") match {
-      case Some(username) => Await.result(User.asSubject(username), FiniteDuration(5, TimeUnit.SECONDS))
+      case Some(username) => Await.result(Auth.asSubject(username), FiniteDuration(5, TimeUnit.SECONDS))
       case None => None
     }
   }

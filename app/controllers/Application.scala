@@ -8,12 +8,13 @@ import play.api.libs.json.Reads._
 import play.api.libs.json._
 import play.api.mvc._
 import models.User
-import scala.concurrent.ExecutionContext.Implicits.global
+import play.modules.reactivemongo.MongoController
+import play.api.Logger
 
 /**
  * @author leodagdag
  */
-object Application extends Controller with DeadboltActions {
+object Application extends Controller with DeadboltActions with MongoController {
 
   def index = SubjectPresent(new MyUserlessDeadboltHandler) {
     Action {
@@ -62,6 +63,7 @@ object Application extends Controller with DeadboltActions {
                 }
             }.recover {
               case e =>
+                Logger.error("authenticate",e)
                 InternalServerError(JsString("exception %s".format(e.getMessage)))
             }
 

@@ -1,5 +1,6 @@
 
 import java.io.File
+import models.User
 import play.api._
 import play.api.mvc.{Result, Handler, RequestHeader}
 
@@ -15,6 +16,9 @@ object Global extends GlobalSettings {
 
   override def onStart(app: Application) {
     Logger.info("Application start ...")
+
+    //User.ensureIndexes
+
     super.onStart(app)
   }
 

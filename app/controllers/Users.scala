@@ -58,6 +58,7 @@ object Users extends Controller with MongoController {
       request.body.transform(validateUser andThen addMongoIdAndDate).map {
         jsobj =>
           Async {
+            User.db
             User.db.insert(jsobj).map {
               p =>
                 Ok(jsobj)
@@ -120,5 +121,24 @@ object Users extends Controller with MongoController {
     }
   }
 
+  def all() = Action {
+    Async {
+      // get the documents having this id (there will be 0 or 1 result)
+      val all: Future[List[Nothing]] = User.all()
+      val cursor  = User.db.find()
+      // ... so we get optionally the matching article, if any
+      // let's use for-comprehensions to compose futures (see http://doc.akka.io/docs/akka/2.0.3/scala/futures.html#For_Comprehensions for more information)
+      for {
+      // get a future option of article
+        maybeUser  <- cursor.headOption
+        // if there is some article, return a future of result with the article and its attachments
+        result <- maybeUser.map {
+          user =>
+            Future(Ok(Json.toJson("")))
+        }.getOrElse(Future(NotFound))
+      } yield result
+    }
+
+  }
 
 }

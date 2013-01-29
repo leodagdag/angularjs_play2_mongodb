@@ -4,6 +4,10 @@ import org.joda.time.DateTime
 import be.objectify.deadbolt.core.models._
 
 import reactivemongo.api._
+
+import indexes.Index
+import indexes.IndexType.Ascending
+import reactivemongo.api.indexes._
 import reactivemongo.bson._
 import reactivemongo.bson.handlers._
 import reactivemongo.bson.handlers.DefaultBSONHandlers._
@@ -12,8 +16,14 @@ import play.modules.reactivemongo._
 import play.modules.reactivemongo.PlayBsonImplicits._
 import scala.concurrent.ExecutionContext.Implicits.global
 
+import play.api._
+import libs.json.JsObject
 import play.api.libs.json._
 import play.libs.Scala
+import reactivemongo.api.QueryBuilder
+import models.SecurityRole
+import reactivemongo.bson.BSONDateTime
+import reactivemongo.bson.BSONString
 
 /**
  * @author leodagdag
@@ -37,7 +47,19 @@ object User {
 
   import play.api.Play.current
 
-  lazy val db: DefaultCollection = ReactiveMongoPlugin.db.collection("user")
+  private val dbName = "user"
+  val db = ReactiveMongoPlugin.db.collection(dbName)
+
+  def ensureIndexes(){
+    List(Index(List("username" -> Ascending), unique = true), Index(List("username" -> Ascending, "password" -> Ascending), unique = true)).foreach {
+      index =>
+        db.indexesManager.ensure(index).onComplete {
+          case result =>
+            Logger.info(s"Checked index $index for [$dbName], result is $result")
+        }
+    }
+  }
+
 
 
   implicit object UserBSONReader extends BSONReader[User] {
@@ -85,5 +107,8 @@ object User {
     User.db.find[User](q).headOption
   }
 
-
+  def all()() = {
+    val q: QueryBuilder = QueryBuilder().query(BSONDocument("" -> new BSONString("")))
+    User.db.find[User](q).headOption
+  }
 }

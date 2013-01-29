@@ -39,8 +39,8 @@ object Users extends Controller with MongoController {
 
   /** Writes an ID in Json Extended Notation */
   val toObjectId: OWrites[String] = OWrites[String] {
-      s => Json.obj("_id" -> Json.obj("$oid" -> s))
-    }
+    s => Json.obj("_id" -> Json.obj("$oid" -> s))
+  }
 
   /** Full Person validator */
   val validatePerson: Reads[JsObject] = (
@@ -52,6 +52,19 @@ object Users extends Controller with MongoController {
 
   /** Converts JSON into Mongo update selector by just copying whole object in $set field */
   val toMongoUpdate: Reads[JsObject] = (__ \ '$set).json.copyFrom(__.json.pick)
+
+  val toUser: OWrites[User] = OWrites[User] {
+    user => Json.obj("_id" -> user.id.map(oid => oid.stringify),
+      "username" -> user.username,
+      "password" -> user.password,
+      "role" -> user.role,
+      "firstName" -> user.firstName,
+      "lastName" -> user.lastName,
+      "created" -> user.created.map(dt => dt.getMillis),
+      "updated" -> user.updated.map(dt => dt.getMillis)
+    )
+  }
+
 
   def create = Action(parse.json) {
     request =>
@@ -72,7 +85,6 @@ object Users extends Controller with MongoController {
           InternalServerError(JsError.toFlatJson(err))
       }
   }
-
 
 
   def updatePerson(id: String) = Action(parse.json) {
@@ -101,44 +113,44 @@ object Users extends Controller with MongoController {
   }
 
 
-  def fetch(id: String) = Action {
+  def fetch(username: String) = Action {
     implicit val reader = User.UserBSONReader
-    val q: QueryBuilder = QueryBuilder().query(toObjectId.writes(id))
     Async {
       // get the documents having this id (there will be 0 or 1 result)
-      val cursor  = User.db.find[User](q)
+
       // ... so we get optionally the matching article, if any
       // let's use for-comprehensions to compose futures (see http://doc.akka.io/docs/akka/2.0.3/scala/futures.html#For_Comprehensions for more information)
       for {
       // get a future option of article
-        maybeUser  <- cursor.headOption
+        maybeUser: Option[User] <- User.byUsername(username)
         // if there is some article, return a future of result with the article and its attachments
         result <- maybeUser.map {
-          user =>
-            Future(Ok(Json.toJson("")))
+          (user: User) =>
+            println(user)
+            Future(Ok(Json.toJson(toUser.writes(user))))
         }.getOrElse(Future(NotFound))
       } yield result
     }
   }
 
-  def all() = Action {
-    Async {
-      // get the documents having this id (there will be 0 or 1 result)
-      val all: Future[List[Nothing]] = User.all()
-      val cursor  = User.db.find()
-      // ... so we get optionally the matching article, if any
-      // let's use for-comprehensions to compose futures (see http://doc.akka.io/docs/akka/2.0.3/scala/futures.html#For_Comprehensions for more information)
-      for {
-      // get a future option of article
-        maybeUser  <- cursor.headOption
-        // if there is some article, return a future of result with the article and its attachments
-        result <- maybeUser.map {
-          user =>
-            Future(Ok(Json.toJson("")))
-        }.getOrElse(Future(NotFound))
-      } yield result
-    }
+/*
+ def all(username: String) = Action {
+   Async {
+     for {
+       maybeUsers: List[User] <- User.all()
 
-  }
+    users <- maybeUsers.map{
+         u =>
+           toUser.writes(u)
+       }
+
+       result <-          Future(Ok(Json.arr(maybeUsers:_*)))
+
+
+     } yield result
+
+   }
+ }
+ */
 
 }

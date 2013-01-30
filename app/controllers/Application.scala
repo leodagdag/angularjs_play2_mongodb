@@ -47,7 +47,10 @@ object Application extends Controller with DeadboltActions with MongoController 
     ).reduce
 
   val toAuthQry: OWrites[JsObject] = OWrites[JsObject] {
-    jsobj => Json.obj(Security.username -> jsobj \ "username", "password" -> jsobj \ "password")
+    jsobj => Json.obj(
+      Security.username -> jsobj \ "username",
+      "password" -> jsobj \ "password"
+    )
   }
 
   def authenticate = Action(parse.json) {

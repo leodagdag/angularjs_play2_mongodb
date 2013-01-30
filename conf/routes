@@ -4,7 +4,7 @@
 
 # Home page
 # ~~~~
-GET     /                                                                           controllers.Application.index
+GET     /                                                                           controllers.Assets.at(path="/public", file="index.html")
 GET     /account                                                                    controllers.Application.account
 GET     /secured                                                                    controllers.Application.secured
 GET     /backoffice                                                                 controllers.Application.backoffice
@@ -23,3 +23,4 @@ GET     /rawusers/:username                                                     
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.at(path="/public", file)
+GET     /public/*file               controllers.Assets.at(path="/public", file)

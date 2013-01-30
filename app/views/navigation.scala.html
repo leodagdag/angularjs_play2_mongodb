@@ -1,0 +1,7 @@
+@(implicit request : play.api.mvc.Request[scala.Any])
+@import be.objectify.deadbolt.scala.views.html._
+@import security._
+
+@restrict(new MyDeadboltHandler(),List(Array("admin"),Array("user"))){
+
+}

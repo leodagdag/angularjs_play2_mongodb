@@ -89,7 +89,6 @@ object Users extends Controller with MongoController {
   def all() = Action {
     Async {
       User.all().map {
-
         list =>
           println(list)
           Ok(Writes.traversableWrites(toUser).writes(list))
@@ -132,8 +131,6 @@ object Users extends Controller with MongoController {
       ((__ \ 'updated).json.pickBranch or emptyObj)
     ).reduce
 
-
-  //val updateObjectId : Reads[JsObject] = (__ \ 'id ).json.update((__ \ 'id \'$oid).json.pick)
 
   def rawFetch(username: String) = Action {
     Async {

@@ -26,6 +26,7 @@ object Application extends Controller with DeadboltActions with MongoController 
 		implicit request =>
 			Ok(views.html.navigation(request))
 	}
+
   def backoffice = Restrictions(List(Array("admin")), new MyDeadboltHandler) {
     Action {
       Ok(Json.obj("result" -> "backoffice : Access OK!"))

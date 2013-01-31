@@ -1,7 +1,0 @@
-<form name="loginForm">
-	<legend>Authentication Form</legend>
-	<input type="text" ng-model="user.username" required>
-	<input type="password" ng-model="user.password" required>
-	<button type="submit" ng-click="authenticate(user)" ng-disabled="loginForm.$invalid">Login</button>
-	<div ng-show="loginError">Authentication failed</div>
-</form>

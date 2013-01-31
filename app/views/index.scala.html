@@ -1,9 +1,16 @@
-@()
-@**
+@(handler: be.objectify.deadbolt.scala.DeadboltHandler)(implicit request: Request[Any])
+
 @import layout._
-@main() {
-    @navigation()
-    <nav>
-    </nav>
-}
-**@
+
+<!DOCTYPE html>
+
+<html lang="fr" data-ng-app="app">
+	<head>
+	@header()
+	</head>
+	<body class="bodyWithFooter">
+		@navigation(handler)
+		<div data-ng-view=""></div>
+		@scripts()
+	</body>
+</html>

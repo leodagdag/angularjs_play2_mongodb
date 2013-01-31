@@ -1,0 +1,28 @@
+@(msgerror: Option[String]=None)
+@import layout._
+<!DOCTYPE html>
+<html lang="fr">
+@header()
+<body>
+	<![if !(IE) | (gte IE 9)]>
+		<form method="post" action="@routes.Application.authenticate()">
+			<fieldset>
+			<legend>Connexion</legend>
+				<label>
+					Nom d'utilisateur
+					<input type="text" name="username" required="required">
+				</label>
+				<label>
+					Mot de passe
+					<input type="password" name="password" required="required">
+				</label>
+				@msgerror.map{msg => <span>@msg</span>}
+				<input type="submit" class="btn btn-primary pull-right" value="Connexion">
+			</fieldset>
+		</form>
+	<![endif]>
+	<!--[if lt IE 9]>
+        Merci d'utiliser un autre navigateur
+     <![endif]-->
+</body>
+</html>

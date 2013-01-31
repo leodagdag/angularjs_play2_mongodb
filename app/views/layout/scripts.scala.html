@@ -1,0 +1,19 @@
+@defining(
+	play.Play.isDev match {
+		case true => ""
+		case _ => ".min"
+	}
+) { isProd =>
+	<script type="text/javascript" src="@routes.Assets.at("javascripts/vendors/angular-1.1.2/angular" + isProd + ".js")"></script>
+	<script type="text/javascript" src="@routes.Assets.at("javascripts/vendors/angular-1.1.2/angular-resource" + isProd + ".js")"></script>
+	<script type="text/javascript" src="@routes.Assets.at("javascripts/vendors/angular-1.1.2/i18n/angular-locale_fr-fr.js")"></script>
+}
+
+@if(play.Play.isProd) {
+	<script type="text/javascript" src="@routes.Assets.at("javascripts/cra.min.js")" ></script>
+} else {
+	<script type="text/javascript" src="@routes.Assets.at("javascripts/app/app.js")"></script>
+	<script type="text/javascript" src="@routes.Assets.at("javascripts/app/controllers/AdminCtrl.js")"></script>
+	<script type="text/javascript" src="@routes.Assets.at("javascripts/app/controllers/AllCtrl.js")"></script>
+	<script type="text/javascript" src="@routes.Assets.at("javascripts/app/controllers/UserCtrl.js")"></script>
+}

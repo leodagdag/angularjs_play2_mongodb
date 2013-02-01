@@ -1,4 +1,4 @@
-package models
+package security
 
 import be.objectify.deadbolt.core.models.Role
 

@@ -1,21 +1,18 @@
-package models
+package security
 
 import be.objectify.deadbolt.core.models._
-
-
-import reactivemongo.bson._
-import reactivemongo.bson.handlers._
-import reactivemongo.bson.handlers.DefaultBSONHandlers._
-
-import play.modules.reactivemongo._
-import scala.concurrent.ExecutionContext.Implicits.global
-
+import concurrent.Future
 import play.api.libs.json._
 import play.libs.Scala
+import play.modules.reactivemongo._
 import reactivemongo.api.QueryBuilder
-
 import reactivemongo.bson.BSONString
-import concurrent.Future
+import reactivemongo.bson._
+import reactivemongo.bson.handlers.DefaultBSONHandlers._
+import reactivemongo.bson.handlers._
+import scala.concurrent.ExecutionContext.Implicits.global
+import models.User
+
 
 /**
  * @author leodagdag

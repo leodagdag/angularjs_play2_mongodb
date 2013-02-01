@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var app = angular.module("app", ['ngResource', 'authServiceProvider']);
 
@@ -17,13 +17,15 @@ app.config(['$routeProvider', function ($routeProvider) {
                 controller: 'AdminCtrl'
             });
     }])
-    .directive('authenticator', function ($location) {
+    .directive('authenticator', ['$location','$window',function ($location,$window) {
         return function (scope, elem, attrs) {
             scope.$on('event:auth-loginRequired', function () {
-                $location.path("/login")
+                //$location.path("/login");
+	            $location.absUrl()
+	            $window.location.href = "/logout";
             })
-        }
-    });
+        };
+    }]);
 
 
 angular.module('authServiceProvider', []).
@@ -32,21 +34,21 @@ angular.module('authServiceProvider', []).
         $httpProvider.responseInterceptors.push(function ($q, $rootScope, $log) {
             function success(response) {
 //            $log.info(response)
-                return response
+                return response;
             }
 
             function error(response) {
                 if (response.status === 401) {
-                    $log.error("401!!!!")
-                    $rootScope.$broadcast('event:auth-loginRequired')
+                    $log.error("401!!!!");
+                    $rootScope.$broadcast('event:auth-loginRequired');
                 }
-                return $q.reject(response)
+                return $q.reject(response);
             }
 
             return function (promise) {
-                return promise.then(success, error)
-            }
+                return promise.then(success, error);
+            };
 
         })
 
-    }])
+    }]);

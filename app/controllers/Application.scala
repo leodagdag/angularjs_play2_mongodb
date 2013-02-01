@@ -1,6 +1,6 @@
 package controllers
 
-import security.MyDeadboltHandler
+import security.{Auth, MyDeadboltHandler}
 import be.objectify.deadbolt.scala.DeadboltActions
 
 //import play.api.libs.functional.syntax._
@@ -8,7 +8,6 @@ import be.objectify.deadbolt.scala.DeadboltActions
 
 import play.api.libs.json._
 import play.api.mvc._
-import models.Auth
 import play.modules.reactivemongo.MongoController
 import play.api.Logger
 
@@ -46,7 +45,7 @@ object Application extends Controller with DeadboltActions with MongoController 
 			Ok(Json.obj("result" -> "Admin access OK!"))
 		}
 	}
-
+	/*
 	def login = Action {
 		implicit request =>
 			Ok(views.html.login())
@@ -55,6 +54,7 @@ object Application extends Controller with DeadboltActions with MongoController 
 	val authenticateForm = Form(tuple(
 		"username" -> nonEmptyText,
 		"password" -> nonEmptyText
+		"redirect" -> optional(text)
 	)
 	)
 
@@ -67,7 +67,16 @@ object Application extends Controller with DeadboltActions with MongoController 
 						Auth.checkAuthentication((login._1, login._2)).map {
 							check =>
 								check match {
-									case Some(ok) => Results.Redirect(routes.Application.index()).withSession(request.session + (Security.username -> login._1))
+									case Some(ok) => {
+										  login._3.map{
+											  next =>
+												  println(routes.Application.index().absoluteURL())
+												  println(next)
+												  Results.Redirect(routes.Application.index().absoluteURL() + "/" + next)
+										  }
+											  .getOrElse(Results.Redirect(routes.Application.index()))
+											  .withSession(request.session + (Security.username -> login._1))
+									}
 									case None => Ok(views.html.login()).withSession(request.session - Security.username)
 								}
 						}.recover {
@@ -85,7 +94,7 @@ object Application extends Controller with DeadboltActions with MongoController 
 		request =>
 			Ok.withSession(request.session - Security.username)
 	}
-
+	*/
 	/*
 		/** Full Person validator */
 		val validateAuthentication: Reads[JsObject] = (

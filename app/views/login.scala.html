@@ -1,11 +1,12 @@
-@(msgerror: Option[String]=None)
+@(msgerror: Option[String]=None)(implicit flash: play.api.mvc.Flash)
 @import layout._
 <!DOCTYPE html>
 <html lang="fr">
 @header()
 <body>
 	<![if !(IE) | (gte IE 9)]>
-		<form method="post" action="@routes.Application.authenticate()">
+		<form method="post" action="@routes.Authentication.authenticate()">
+			<input type="hidden" name="redirect" value="@flash.get("redirect").map(url => url)">
 			<fieldset>
 			<legend>Connexion</legend>
 				<label>

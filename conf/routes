@@ -11,9 +11,9 @@ GET     /admin                                                                 c
 
 # Authentication
 # ~~~~
-GET    /login                                                                       controllers.Application.login
-POST    /auth                                                                       controllers.Application.authenticate
-GET     /logout                                                                     controllers.Application.logout
+GET    /login                                                                       controllers.Authentication.login
+POST    /auth                                                                       controllers.Authentication.authenticate
+GET     /logout                                                                     controllers.Authentication.logout
 
 # User
 # ~~~~

@@ -68,7 +68,6 @@ object Application extends Controller with DeadboltActions with MongoController 
 							check =>
 								check match {
 									case Some(ok) => Results.Redirect(routes.Application.index()).withSession(request.session + (Security.username -> login._1))
-
 									case None => Ok(views.html.login()).withSession(request.session - Security.username)
 								}
 						}.recover {

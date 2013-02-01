@@ -3,7 +3,7 @@ jdk:
   - openjdk7
   - oraclejdk7
 env:
-  - PLAY_VERSION=2.1-RC2
+  - PLAY_VERSION=2.1-RC3
 before_script:
   - chmod +x travis/setup.sh
   - ./travis/setup.sh

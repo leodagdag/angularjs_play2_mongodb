@@ -1,4 +1,4 @@
-@(msgerror: Option[String]=None)(implicit flash: play.api.mvc.Flash)
+@()(implicit flash: play.api.mvc.Flash)
 @import layout._
 <!DOCTYPE html>
 <html lang="fr">
@@ -8,16 +8,16 @@
 		<form method="post" action="@routes.Authentication.authenticate()">
 			<input type="hidden" name="redirect" value="@flash.get("redirect").map(url => url)">
 			<fieldset>
-			<legend>Connexion</legend>
+			<legend>Connection</legend>
 				<label>
-					Nom d'utilisateur
+					login
 					<input type="text" name="username" required="required">
 				</label>
 				<label>
-					Mot de passe
+					password
 					<input type="password" name="password" required="required">
+					<span>@flash.get("errormsg").map(errormsg => errormsg)</span>
 				</label>
-				@msgerror.map{msg => <span>@msg</span>}
 				<input type="submit" class="btn btn-primary pull-right" value="Connexion">
 			</fieldset>
 		</form>

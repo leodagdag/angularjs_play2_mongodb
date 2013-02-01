@@ -1,17 +1,17 @@
 package security
 
-import be.objectify.deadbolt.core.models._
+
+import be.objectify.deadbolt.core.models.{Permission, Subject}
 import concurrent.Future
-import play.api.libs.json._
+
+import play.api.Play.current
 import play.libs.Scala
-import play.modules.reactivemongo._
+import play.modules.reactivemongo.ReactiveMongoPlugin
 import reactivemongo.api.QueryBuilder
-import reactivemongo.bson.BSONString
-import reactivemongo.bson._
-import reactivemongo.bson.handlers.DefaultBSONHandlers._
-import reactivemongo.bson.handlers._
+import reactivemongo.bson.handlers.DefaultBSONHandlers.{DefaultBSONDocumentWriter, DefaultBSONReaderHandler}
+import reactivemongo.bson.handlers.{BSONWriter, BSONReader}
+import reactivemongo.bson.{BSONInteger, BSONString, BSONDocument, BSONObjectID}
 import scala.concurrent.ExecutionContext.Implicits.global
-import models.User
 
 
 /**
@@ -29,8 +29,6 @@ case class Auth(id: Option[BSONObjectID],
 }
 
 object Auth {
-
-	import play.api.Play.current
 
 	private val dbName = "user"
 
@@ -70,6 +68,6 @@ object Auth {
 
 	def asSubject(username: String) = {
 		val q: QueryBuilder = QueryBuilder().query(BSONDocument("username" -> new BSONString(username)))
-		User.db.find[Subject](q).headOption
+		db.find[Subject](q).headOption
 	}
 }

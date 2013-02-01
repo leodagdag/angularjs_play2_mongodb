@@ -4,25 +4,17 @@
 
 # Home page
 # ~~~~
-GET     /                                                                           controllers.Application.index
-GET     /user                                                                    controllers.Application.user
-GET     /all                                                                    controllers.Application.all
-GET     /admin                                                                 controllers.Application.admin
+GET     /                           controllers.Application.index
+GET     /user                       controllers.Application.user
+GET     /all                        controllers.Application.all
+GET     /admin                      controllers.Application.admin
 
 # Authentication
 # ~~~~
-GET    /login                                                                       controllers.Authentication.login
-POST    /auth                                                                       controllers.Authentication.authenticate
-GET     /logout                                                                     controllers.Authentication.logout
-
-# User
-# ~~~~
-GET    /users                                                                      controllers.Users.all()
-GET     /rawusers                                                                     controllers.Users.rawAll()
-GET     /users/:username                                                            controllers.Users.fetch(username : String)
-GET     /rawusers/:username                                                            controllers.Users.rawFetch(username : String)
+GET     /login                      controllers.Authentication.login
+POST    /auth                       controllers.Authentication.authenticate
+GET     /logout                     controllers.Authentication.logout
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.at(path="/public", file)
-#GET     /                                                                           controllers.Assets.at(path="/public", file="index.html")
 GET     /public/*file               controllers.Assets.at(path="/public", file)

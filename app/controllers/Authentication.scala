@@ -1,14 +1,18 @@
 package controllers
 
-import play.api.mvc.{Action, Security, Results, Controller}
 import be.objectify.deadbolt.scala.DeadboltActions
-import play.modules.reactivemongo.MongoController
+import play.api.Logger
 import play.api.data.Form
-import play.api.data.Forms._
+import play.api.data.Forms.nonEmptyText
+import play.api.data.Forms.optional
+import play.api.data.Forms.text
+import play.api.data.Forms.tuple
+import play.api.libs.json.JsString
+import play.api.mvc.{Action, Security, Results, Controller}
+import play.modules.reactivemongo.MongoController
 import scala.Some
 import security.Auth
-import play.api.Logger
-import play.api.libs.json.JsString
+
 
 /**
  * @author leodagdag
@@ -24,8 +28,7 @@ object Authentication extends Controller with DeadboltActions with MongoControll
 		"username" -> nonEmptyText,
 		"password" -> nonEmptyText,
 		"redirect" -> optional(text)
-	)
-	)
+	))
 
 	def authenticate = Action {
 		implicit request =>
@@ -37,13 +40,13 @@ object Authentication extends Controller with DeadboltActions with MongoControll
 							check =>
 								check match {
 									case Some(ok) => {
-										login._3.map{next =>
-											Results.Redirect(routes.Application.index() + "#" + next)
-										}
+										login._3.map(next => Results.Redirect(routes.Application.index() + "#" + next))
 											.getOrElse(Results.Redirect(routes.Application.index()))
 											.withSession(request.session + (Security.username -> login._1))
 									}
-									case None => Ok(views.html.login()).withSession(request.session - Security.username)
+									case None => Results.Redirect(routes.Authentication.login())
+										.withSession(request.session - Security.username)
+										.flashing(("errormsg" -> "Bad login or password"))
 								}
 						}.recover {
 							case e =>

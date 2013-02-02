@@ -20,13 +20,11 @@ class ApplicationSpec extends Specification {
       }
     }
     
-    "render the index page" in {
+    "Send an see_other on accessing index page without authorization" in {
       running(FakeApplication()) {
         val home = route(FakeRequest(GET, "/")).get
         
-        status(home) must equalTo(UNAUTHORIZED)
-        //contentType(home) must beSome.which(_ == "text/html")
-        //contentAsString(home) must contain ("Your new application is ready.")
+        status(home) must equalTo(SEE_OTHER)
       }
     }
   }
